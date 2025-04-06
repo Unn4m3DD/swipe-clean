@@ -16,9 +16,7 @@ export default function SelectApps({
   const { data, isLoading, error } = useQuery({
     queryKey: ["getInstalledApps"],
     queryFn: async () => {
-      return (await SwipeCleanModule.getInstalledApps()).filter((e) =>
-        e.packageName.includes("gymflow"),
-      );
+      return await SwipeCleanModule.getInstalledApps();
     },
   });
   const [currentResult, setCurrentResult] = useState<
