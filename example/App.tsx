@@ -1,10 +1,57 @@
-import { TouchableOpacity, SafeAreaView, ScrollView, Text } from "react-native";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+import {
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  Image,
+} from "react-native";
 import SwipeClean from "swipe-clean";
-
-export default function App() {
+const queryClient = new QueryClient();
+export default () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
+};
+function App() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["getInstalledApps"],
+    queryFn: async () => {
+      return await SwipeClean.getInstalledApps();
+    },
+  });
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>Error: {error.message}</Text>
+        ) : (
+          data?.map((app) => {
+            console.log(app.icon);
+            return (
+              <TouchableOpacity
+                key={app.packageName}
+                onPress={() => {
+                  console.log(SwipeClean.uninstall(app.packageName));
+                }}
+              >
+                <Image
+                  source={{ uri: `data:image/png;base64,${app.icon}` }}
+                  style={{ width: 50, height: 50 }}
+                />
+                <Text>{app.name}</Text>
+              </TouchableOpacity>
+            );
+          })
+        )}
         <TouchableOpacity
           onPress={() => {
             console.log("clicked");
@@ -12,14 +59,6 @@ export default function App() {
           }}
         >
           <Text>Uninstall</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            console.log("clicked");
-            console.log(await SwipeClean.getInstalledApps());
-          }}
-        >
-          <Text>getInstalledApps</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -28,11 +28,10 @@
   "author": "Unn4m3DD <andrepatacass@gmail.com> (https://github.com/Unn4m3DD)",
   "license": "MIT",
   "homepage": "https://github.com/Unn4m3DD/swipe-clean#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "~18.3.12",
-    "expo-module-scripts": "^4.0.4",
     "expo": "~52.0.0",
+    "expo-module-scripts": "^4.0.4",
     "react-native": "0.76.0"
   },
   "peerDependencies": {

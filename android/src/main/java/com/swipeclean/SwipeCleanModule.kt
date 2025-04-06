@@ -35,21 +35,32 @@ class SwipeCleanModule : Module() {
             }
         }
         AsyncFunction("getInstalledApps") { 
-          val packageManager = appContext.reactContext!!.packageManager
-          val apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-          val appList = mutableListOf<Map<String, Any>>()
-
-          for (app in apps) {
-              val appInfo = mutableMapOf<String, Any>()
-              val appName = packageManager.getApplicationLabel(app).toString()
-              val appIcon: Drawable = packageManager.getApplicationIcon(app)
-
-              appInfo["name"] = appName
-              appInfo["packageName"] = app.packageName
-              appInfo["icon"] = drawableToBase64(appIcon)
-
-              appList.add(appInfo)
-          }
+            val packageManager = appContext.reactContext!!.packageManager
+            val apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+            val appList = mutableListOf<Map<String, Any>>()
+        
+            for (app in apps) {
+                val isSystemApp = (app.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+                if (!isSystemApp) {
+                    // Check if the app has a launchable activity (visible in launcher)
+                    try {
+                        val launchIntent = packageManager.getLaunchIntentForPackage(app.packageName)
+                        if (launchIntent != null) {
+                            val appInfo = mutableMapOf<String, Any>()
+                            val appName = packageManager.getApplicationLabel(app).toString()
+                            val appIcon: Drawable = packageManager.getApplicationIcon(app)
+        
+                            appInfo["name"] = appName
+                            appInfo["packageName"] = app.packageName
+                            appInfo["icon"] = drawableToBase64(appIcon)
+        
+                            appList.add(appInfo)
+                        }
+                    } catch (e: Exception) {
+                        // Skip apps that can't be launched (e.g., apps with no launchable activity)
+                    }
+                }
+            }
 
           return@AsyncFunction appList 
       }
