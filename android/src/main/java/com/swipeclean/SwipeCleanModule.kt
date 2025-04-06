@@ -1,50 +1,83 @@
 package com.swipeclean
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.content.Context
+
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
+import expo.modules.kotlin.Promise
 
 class SwipeCleanModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
-  override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('SwipeClean')` in JavaScript.
-    Name("SwipeClean")
+    override fun definition() = ModuleDefinition {
+        Name("SwipeClean")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
+        Function("uninstall") { bundleId: String ->
+            val activity = appContext.activityProvider?.currentActivity
+            
+            if (activity == null) {
+                return@Function "Failed1"
+            }
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+            val intent = Intent(Intent.ACTION_DELETE).apply {
+                data = Uri.parse("package:$bundleId")
+                putExtra(Intent.EXTRA_RETURN_RESULT, true)
+            }
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
-    }
+            try {
+              activity.startActivityForResult(intent, 1)
+                return@Function "success1"
+            } catch (e: Exception) {
+                return@Function "fail2"
+            }
+        }
+        AsyncFunction("getInstalledApps") { 
+          val packageManager = appContext.reactContext!!.packageManager
+          val apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+          val appList = mutableListOf<Map<String, Any>>()
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
-    }
+          for (app in apps) {
+              val appInfo = mutableMapOf<String, Any>()
+              val appName = packageManager.getApplicationLabel(app).toString()
+              val appIcon: Drawable = packageManager.getApplicationIcon(app)
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(SwipeCleanView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: SwipeCleanView, url: URL ->
-        view.webView.loadUrl(url.toString())
+              appInfo["name"] = appName
+              appInfo["packageName"] = app.packageName
+              appInfo["icon"] = drawableToBase64(appIcon)
+
+              appList.add(appInfo)
+          }
+
+          return@AsyncFunction appList 
       }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
     }
+    private fun drawableToBase64(drawable: Drawable): String {
+      // Check if the Drawable is a BitmapDrawable
+      val bitmap = if (drawable is android.graphics.drawable.BitmapDrawable) {
+          drawable.bitmap
+      } else {
+          // If it's not a BitmapDrawable, create a bitmap from the Drawable
+          val width = drawable.intrinsicWidth
+          val height = drawable.intrinsicHeight
+  
+          // Ensure the Drawable has valid dimensions
+          if (width <= 0 || height <= 0) {
+              return ""  // Return empty string if dimensions are invalid
+          }
+  
+          val bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+          val canvas = android.graphics.Canvas(bitmap)
+          drawable.setBounds(0, 0, canvas.width, canvas.height)
+          drawable.draw(canvas)
+          bitmap
+      }
+  
+      val byteArrayOutputStream = java.io.ByteArrayOutputStream()
+      bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+      val byteArray = byteArrayOutputStream.toByteArray()
+      return android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)
   }
 }

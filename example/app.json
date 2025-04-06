@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.swipeclean.example"
+      "package": "com.swipeclean.example",
+      "permissions": ["android.permission.REQUEST_DELETE_PACKAGES"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,49 +1,28 @@
-import { useEvent } from 'expo';
-import SwipeClean, { SwipeCleanView } from 'swipe-clean';
-import { Button, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import { TouchableOpacity, SafeAreaView, ScrollView, Text } from "react-native";
+import SwipeClean from "swipe-clean";
 
 export default function App() {
-  const onChangePayload = useEvent(SwipeClean, 'onChange');
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container}>
-        <Text style={styles.header}>Module API Example</Text>
-        <Group name="Constants">
-          <Text>{SwipeClean.PI}</Text>
-        </Group>
-        <Group name="Functions">
-          <Text>{SwipeClean.hello()}</Text>
-        </Group>
-        <Group name="Async functions">
-          <Button
-            title="Set value"
-            onPress={async () => {
-              await SwipeClean.setValueAsync('Hello from JS!');
-            }}
-          />
-        </Group>
-        <Group name="Events">
-          <Text>{onChangePayload?.value}</Text>
-        </Group>
-        <Group name="Views">
-          <SwipeCleanView
-            url="https://www.example.com"
-            onLoad={({ nativeEvent: { url } }) => console.log(`Loaded: ${url}`)}
-            style={styles.view}
-          />
-        </Group>
+        <TouchableOpacity
+          onPress={() => {
+            console.log("clicked");
+            console.log(SwipeClean.uninstall("com.whatsapp"));
+          }}
+        >
+          <Text>Uninstall</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            console.log("clicked");
+            console.log(await SwipeClean.getInstalledApps());
+          }}
+        >
+          <Text>getInstalledApps</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function Group(props: { name: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.group}>
-      <Text style={styles.groupHeader}>{props.name}</Text>
-      {props.children}
-    </View>
   );
 }
 
@@ -58,13 +37,13 @@ const styles = {
   },
   group: {
     margin: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
   },
   container: {
     flex: 1,
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
   },
   view: {
     flex: 1,

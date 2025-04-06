@@ -1,12 +1,8 @@
-import { NativeModule, requireNativeModule } from 'expo';
+import { NativeModule, requireNativeModule } from "expo";
 
-import { SwipeCleanModuleEvents } from './SwipeClean.types';
-
-declare class SwipeCleanModule extends NativeModule<SwipeCleanModuleEvents> {
-  PI: number;
-  hello(): string;
-  setValueAsync(value: string): Promise<void>;
+declare class SwipeCleanModule extends NativeModule {
+  uninstall(bundleId: string): string;
+  getInstalledApps(): Promise<any>;
 }
 
-// This call loads the native module object from the JSI.
-export default requireNativeModule<SwipeCleanModule>('SwipeClean');
+export default requireNativeModule<SwipeCleanModule>("SwipeClean");
