@@ -49,6 +49,7 @@ export default function SelectApps({
             Filtering {currentResult.length} of {data.length}
           </Text>
           <SwipeItem
+            key={data[currentResult.length].packageName}
             app={data[currentResult.length]}
             onSwipe={(result: "KEEP" | "DELETE") => {
               setCurrentResult((prev) => {

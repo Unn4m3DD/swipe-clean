@@ -1,6 +1,8 @@
-import { Dimensions, Image, View } from "react-native";
+import { Dimensions, Image } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  FadeIn,
+  FadeOut,
   interpolate,
   interpolateColor,
   runOnJS,
@@ -20,23 +22,23 @@ export default function SwipeItem({
   app: AppType;
   onSwipe: (result: "KEEP" | "DELETE") => void;
 }) {
-  const current = useSharedValue<"NEUTRAL" | "KEEP" | "DELETE">("NEUTRAL");
   const offset = useSharedValue<number>(0);
 
   const pan = Gesture.Pan()
     .onBegin(() => {})
     .onChange((event) => {
-      offset.value = event.translationX;
-      current.value = event.translationX > width / 2 ? "KEEP" : "DELETE";
+      offset.value = event.translationX * 2;
     })
     .onFinalize(() => {
       if (offset.value > width / 2) {
         runOnJS(onSwipe)("KEEP");
+        offset.value = withSpring(width);
       } else if (offset.value < -width / 2) {
         runOnJS(onSwipe)("DELETE");
+        offset.value = withSpring(-width);
+      } else {
+        offset.value = withSpring(0);
       }
-      current.value = "NEUTRAL";
-      offset.value = withSpring(0);
     });
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [
@@ -58,7 +60,11 @@ export default function SwipeItem({
     ),
   }));
   return (
-    <View className="h-2/3 w-full p-8">
+    <Animated.View
+      entering={FadeIn}
+      exiting={FadeOut}
+      className="h-2/3 w-full p-8"
+    >
       <GestureDetector gesture={pan}>
         <Animated.View
           className="h-full w-full border-green-500 border items-center justify-center gap-4 rounded-lg bg-white"
@@ -72,6 +78,6 @@ export default function SwipeItem({
           <Text className="text-center text-lg font-semibold">{app.name}</Text>
         </Animated.View>
       </GestureDetector>
-    </View>
+    </Animated.View>
   );
 }
