@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'swipe-clean-example'
+rootProject.name = 'SwipeClean'
 
 dependencyResolutionManagement {
   versionCatalogs {
