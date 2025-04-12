@@ -5,20 +5,23 @@ import Animated, {
   FadeOut,
   SlideInLeft,
 } from "react-native-reanimated";
-import SwipeCleanModule, { AppType } from "swipe-clean/SwipeCleanModule";
+import SwipeCleanModule from "swipe-clean/SwipeCleanModule";
 
 import { Button } from "./components/Button";
 import { Text } from "./components/Text";
+import { AppType } from "../../types";
 
 export default function Uninstaller({
   toUninstall,
   reset,
+  setIsFinished,
 }: {
   toUninstall: {
     app: AppType;
     result: "KEEP" | "DELETE";
   }[];
   reset: () => void;
+  setIsFinished: (value: boolean) => void;
 }) {
   return (
     <Animated.View
@@ -30,8 +33,8 @@ export default function Uninstaller({
         Uninstalling {toUninstall.length} apps
       </Text>
       <ScrollView
-        className="h-2/3 w-full p-8"
-        contentContainerClassName="gap-4"
+        className="h-2/3 w-full"
+        contentContainerClassName="gap-4 p-8"
       >
         {toUninstall.map((app, i) => (
           <Animated.View
@@ -65,6 +68,7 @@ export default function Uninstaller({
             for (const app of toUninstall) {
               SwipeCleanModule.uninstall(app.app.packageName);
             }
+            setIsFinished(true);
           }}
         >
           <Text>Confirm Uninstall</Text>

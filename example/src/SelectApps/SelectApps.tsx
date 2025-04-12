@@ -1,22 +1,29 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import SwipeCleanModule, { AppType } from "swipe-clean/SwipeCleanModule";
+import SwipeCleanModule from "swipe-clean/SwipeCleanModule";
 
 import SwipeItem from "./SwipeItem";
+import { AppType } from "../../../types";
 import { Button } from "../components/Button";
 import { Text } from "../components/Text";
 
 export default function SelectApps({
   onFinish,
+  filter,
+  reset,
 }: {
   onFinish: (result: { app: AppType; result: "KEEP" | "DELETE" }[]) => void;
+  filter: string;
+  reset: () => void;
 }) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["getInstalledApps"],
+    queryKey: ["getInstalledApps", filter],
     queryFn: async () => {
-      return await SwipeCleanModule.getInstalledApps();
+      return (await SwipeCleanModule.getInstalledApps()).filter((app) =>
+        app.packageName.includes(filter),
+      );
     },
   });
   const [currentResult, setCurrentResult] = useState<
@@ -25,7 +32,11 @@ export default function SelectApps({
       result: "KEEP" | "DELETE";
     }[]
   >([]);
-
+  useEffect(() => {
+    if (currentResult.length === data?.length) {
+      onFinish(currentResult);
+    }
+  }, [data, onFinish, currentResult]);
   return (
     <>
       {isLoading && (
@@ -48,21 +59,29 @@ export default function SelectApps({
           <Text className="text-center text-xl font-bold">
             Filtering {currentResult.length} of {data.length}
           </Text>
-          <SwipeItem
-            app={data[currentResult.length]}
-            onSwipe={(result: "KEEP" | "DELETE") => {
-              setCurrentResult((prev) => {
-                const next = prev.concat({
-                  app: data[currentResult.length],
-                  result,
-                });
-                if (next.length === data.length) {
-                  onFinish(next);
-                }
-                return next;
-              });
-            }}
-          />
+          <View className="relative h-2/3">
+            {data
+              .slice(
+                currentResult.length,
+                Math.min(data.length, currentResult.length + 2),
+              )
+              .reverse()
+              .map((app, i) => (
+                <SwipeItem
+                  key={app.packageName}
+                  app={app}
+                  onSwipe={(result: "KEEP" | "DELETE") => {
+                    setCurrentResult((prev) => {
+                      return prev.concat({
+                        app,
+                        result,
+                      });
+                    });
+                  }}
+                />
+              ))}
+          </View>
+
           <View className="flex flex-row gap-8 justify-center">
             <Button
               variant="default"
@@ -75,7 +94,7 @@ export default function SelectApps({
             </Button>
             <Button
               onPress={() => {
-                setCurrentResult([]);
+                reset();
               }}
             >
               <Text>Reset</Text>
