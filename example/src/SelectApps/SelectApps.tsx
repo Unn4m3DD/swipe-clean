@@ -43,7 +43,7 @@ export default function SelectApps({
         <Animated.View
           entering={FadeIn}
           exiting={FadeOut}
-          className="flex flex-col h-full items-center justify-center gap-2"
+          className="flex flex-col h-full items-center justify-center gap-2 bg-background"
         >
           <Text className="text-center text-xl font-bold">Loading...</Text>
           <ActivityIndicator />
@@ -54,7 +54,7 @@ export default function SelectApps({
         <Animated.View
           entering={FadeIn}
           exiting={FadeOut}
-          className="flex flex-col gap-8 pt-16 h-full"
+          className="flex flex-col gap-8 pt-16 h-full bg-background"
         >
           <Text className="text-center text-xl font-bold">
             Filtering {currentResult.length} of {data.length}

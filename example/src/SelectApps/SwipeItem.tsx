@@ -65,7 +65,7 @@ export default function SwipeItem({
     <View className="absolute inset-0 w-full p-8">
       <GestureDetector gesture={pan}>
         <Animated.View
-          className="h-full w-full border-green-500 border items-center justify-center gap-4 rounded-lg bg-white"
+          className="h-full w-full border items-center justify-center gap-4 rounded-lg bg-card"
           style={animatedStyles}
           key={app.packageName}
           entering={FadeIn}

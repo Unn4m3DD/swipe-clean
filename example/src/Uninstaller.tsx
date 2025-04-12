@@ -25,7 +25,7 @@ export default function Uninstaller({
 }) {
   return (
     <Animated.View
-      className="flex flex-col gap-8 pt-16 h-full"
+      className="flex flex-col gap-8 pt-16 h-full bg-background"
       entering={FadeIn}
       exiting={FadeOut}
     >

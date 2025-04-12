@@ -1,4 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useColorScheme } from "nativewind";
+import React from "react";
 import { SafeAreaView, StatusBar, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -11,11 +13,16 @@ export default () => {
     </QueryClientProvider>
   );
 };
+
 function App() {
+  const { colorScheme } = useColorScheme();
   return (
     <SafeAreaView>
-      <StatusBar barStyle="dark-content" />
-      <View className="h-full w-full">
+      <StatusBar
+        barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={colorScheme === "dark" ? "black" : "white"}
+      />
+      <View className="h-full w-full bg-background">
         <GestureHandlerRootView className="h-full w-full">
           <Home />
         </GestureHandlerRootView>

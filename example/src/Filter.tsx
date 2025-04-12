@@ -13,7 +13,7 @@ export default function Filter({
   const [internalFilter, setInternalFilter] = useState<string>();
   return (
     <Animated.View
-      className="flex flex-col gap-8 pb-16 h-full items-center justify-center"
+      className="flex flex-col gap-8 pb-16 h-full items-center justify-center bg-background"
       entering={FadeIn}
       exiting={FadeOut}
     >

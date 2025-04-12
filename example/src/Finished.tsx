@@ -6,7 +6,7 @@ import { Text } from "./components/Text";
 export default function Finished({ reset }: { reset: () => void }) {
   return (
     <Animated.View
-      className="flex flex-col gap-8 items-center justify-center h-full"
+      className="flex flex-col gap-8 items-center justify-center h-full bg-background"
       entering={FadeIn}
       exiting={FadeOut}
     >
